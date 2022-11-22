@@ -33,7 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define ITM_Port32(n) (*((volatile unsigned long *)(0xE0000000+4*n)))
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -229,9 +229,10 @@ void TIM1_UP_TIM10_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
-  int counter = TIM2->CNT;
-  int tenH = 5*sin(2*3.14*2*counter);
-  int twoH = 2*sin(2*3.14*10*counter);
+  //ITM_Port32(31)=1;// Time identification of Port 31 with 1
+  double counter = TIM2->CNT;
+  int tenH =1000*sin(2*M_PI*10*counter);
+  int twoH =1000*cos(2*M_PI*2*counter);
   SERIAL_SendToPlot(&tenH,&twoH, 2);
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
@@ -246,14 +247,11 @@ void TIM3_IRQHandler(void)
 void EXTI15_10_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
-	static int trig = 1;
-  if(trig){
+  if(TIM3->CR1 & 0x00000001){
 	  HAL_TIM_Base_Stop_IT(&htim3);
-	  trig = 0;
   }
   else{
 	  HAL_TIM_Base_Start_IT(&htim3);
-	  trig = 1;
   }
   /* USER CODE END EXTI15_10_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(B1_Pin);

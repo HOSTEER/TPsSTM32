@@ -46,6 +46,8 @@ TIM_HandleTypeDef htim3;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+uint8_t globalCounter=0;
+char msg[50];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/

@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "serial.h"
 #include "math.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -229,11 +230,15 @@ void TIM1_UP_TIM10_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
-  //ITM_Port32(31)=1;// Time identification of Port 31 with 1
-  double counter = TIM2->CNT;
-  int tenH =1000*sin(2*M_PI*10*counter);
-  int twoH =1000*cos(2*M_PI*2*counter);
-  SERIAL_SendToPlot(&tenH,&twoH, 2);
+  ITM_Port32(31)=1;// Time identification of Port 31 with 1
+  if(globalCounter<100){
+	  double counter = (double) TIM2->CNT;
+	  counter *= 0.000001;
+	  double tenH =sin(2*M_PI*10*counter);
+	  double twoH =sin(2*M_PI*2*counter);
+	  SERIAL_SendFloatToPlot(tenH, twoH);
+	  globalCounter++;
+  }
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
@@ -247,11 +252,14 @@ void TIM3_IRQHandler(void)
 void EXTI15_10_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
-  if(TIM3->CR1 & 0x00000001){
+  /*if(TIM3->CR1 & 0x00000001){
 	  HAL_TIM_Base_Stop_IT(&htim3);
   }
   else{
 	  HAL_TIM_Base_Start_IT(&htim3);
+  }*/
+  if(globalCounter==100){
+	  globalCounter=0;
   }
   /* USER CODE END EXTI15_10_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(B1_Pin);

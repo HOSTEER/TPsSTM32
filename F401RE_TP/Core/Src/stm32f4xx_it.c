@@ -58,8 +58,11 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern ADC_HandleTypeDef hadc1;
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim3;
+extern TIM_HandleTypeDef htim4;
+extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -203,6 +206,20 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles ADC1 global interrupt.
+  */
+void ADC_IRQHandler(void)
+{
+  /* USER CODE BEGIN ADC_IRQn 0 */
+  adcVal=HAL_ADC_GetValue(&hadc1);
+  /* USER CODE END ADC_IRQn 0 */
+  HAL_ADC_IRQHandler(&hadc1);
+  /* USER CODE BEGIN ADC_IRQn 1 */
+
+  /* USER CODE END ADC_IRQn 1 */
+}
+
+/**
   * @brief This function handles TIM1 update interrupt and TIM10 global interrupt.
   */
 void TIM1_UP_TIM10_IRQHandler(void)
@@ -214,8 +231,9 @@ void TIM1_UP_TIM10_IRQHandler(void)
   else{
 	  GPIOA->ODR=GPIOA->ODR | 0x00000020;
   }
-  //SERIAL_SendInt(TIM2->CNT);
-  //SERIAL_SendNL();
+  /*SERIAL_SendInt(TIM2->CNT);
+  SERIAL_SendNL();
+  ITM_Port32(31)=1;*/
   //HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
   /* USER CODE END TIM1_UP_TIM10_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
@@ -230,20 +248,51 @@ void TIM1_UP_TIM10_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
-  ITM_Port32(31)=1;// Time identification of Port 31 with 1
   if(globalCounter<100){
+	  //ITM_Port32(31)=1;
 	  double counter = (double) TIM2->CNT;
 	  counter *= 0.000001;
-	  double tenH =sin(2*M_PI*10*counter);
-	  double twoH =sin(2*M_PI*2*counter);
-	  SERIAL_SendFloatToPlot(tenH, twoH);
+	  tenH[globalCounter] =sin(2*M_PI*100*counter);
+	  twoH[globalCounter] =cos(2*M_PI*20*counter);
 	  globalCounter++;
+	  //ITM_Port32(31)=2;
   }
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
-
   /* USER CODE END TIM3_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM4 global interrupt.
+  */
+void TIM4_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM4_IRQn 0 */
+  HAL_ADC_Start_IT(&hadc1);
+  /* USER CODE END TIM4_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim4);
+  /* USER CODE BEGIN TIM4_IRQn 1 */
+
+  /* USER CODE END TIM4_IRQn 1 */
+}
+
+/**
+  * @brief This function handles USART2 global interrupt.
+  */
+void USART2_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART2_IRQn 0 */
+  if(recieved[0]=='a'||recieved[0]=='A'){
+	  selector=1;
+  }else{
+	  selector=0;
+  }
+  /* USER CODE END USART2_IRQn 0 */
+  HAL_UART_IRQHandler(&huart2);
+  /* USER CODE BEGIN USART2_IRQn 1 */
+
+  /* USER CODE END USART2_IRQn 1 */
 }
 
 /**
@@ -258,7 +307,8 @@ void EXTI15_10_IRQHandler(void)
   else{
 	  HAL_TIM_Base_Start_IT(&htim3);
   }*/
-  if(globalCounter==100){
+  if(globalCounter>99){
+	  SERIAL_SendFloatToPlot(tenH, twoH,100);
 	  globalCounter=0;
   }
   /* USER CODE END EXTI15_10_IRQn 0 */

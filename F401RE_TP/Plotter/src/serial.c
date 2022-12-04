@@ -60,11 +60,14 @@ void SERIAL_SendToPlot(int * dataA,int *dataB,int nb){
 	}
 }
 
-void SERIAL_SendFloatToPlot(double dataA, double dataB){
-	SERIAL_SendCharBuf("a:");
-	SERIAL_SendFloat(dataA);
-	SERIAL_SendCharBuf(",");
-	SERIAL_SendCharBuf("b:");
-	SERIAL_SendFloat(dataB);
-	SERIAL_SendNL();
+void SERIAL_SendFloatToPlot(double * dataA,double *dataB,int nb){
+	int n=0;
+	for(n=0;n<nb;n++){
+		SERIAL_SendCharBuf("a:");
+		SERIAL_SendFloat(dataA[n]);
+		SERIAL_SendCharBuf(",");
+		SERIAL_SendCharBuf("b:");
+		SERIAL_SendFloat(dataB[n]);
+		SERIAL_SendNL();
+	}
 }

@@ -36,9 +36,16 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-extern UART_HandleTypeDef huart2;
 extern uint8_t globalCounter;
-extern char msg[50];
+extern double tenH[100];
+extern double twoH[100];
+extern uint32_t adcVal;
+extern ADC_HandleTypeDef hadc1;
+extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim3;
+extern TIM_HandleTypeDef htim4;
+extern uint8_t recieved[5];
+extern uint8_t selector;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/

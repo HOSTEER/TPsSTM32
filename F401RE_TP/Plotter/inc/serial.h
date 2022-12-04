@@ -14,6 +14,6 @@ void SERIAL_SendFloat(float v);
 void SERIAL_SendNL(void);
 void SERIAL_SendTAB(void);
 void SERIAL_SendToPlot(int * dataA,int *dataB,int nb);
-void SERIAL_SendFloatToPlot(double dataA, double dataB);
+void SERIAL_SendFloatToPlot(double * dataA,double *dataB,int nb);
 
 #endif /* INC_SERIAL_H_ */
